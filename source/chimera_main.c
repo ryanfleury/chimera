@@ -45,7 +45,7 @@ Codebase Notes
 .  * foreach(it, limit) is equivalent to:
 .    for(u64 it = 0; it < limit; ++it)
 .
-.  * alloc_heap_memory(size) is an alias for
+.  * alloc_heap_memory(num_bytes) is an alias for
 .    a function that heap-allocates memory
 .    and returns a void * to it. This maps to the
 .    C standard library's "malloc" function.

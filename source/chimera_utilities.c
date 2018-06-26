@@ -30,6 +30,6 @@ typedef i64 b64;
 #define gigabytes(n) (megabytes(n)*1024)
 
 #define alloc_heap_memory(n) malloc(n)
-#define free_heap_memory(m) free(m)
+#define free_heap_memory(m)  free(m)
 
 #define foreach(i, lim) for(u64 (i) = 0; (i) < (u64)(lim); ++(i))
