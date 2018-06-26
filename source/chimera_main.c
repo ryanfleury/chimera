@@ -12,31 +12,31 @@ Codebase Notes
 ..................................................
 
 1  Fixed-size types are standard, and have
-         .  short typedefs for convenience. A list
-         .  follows:
-         .  
-         .  Signed Integers:
-         .    * i8  or s8  (8-bit)
-         .    * i16 or s16 (16-bit)
-         .    * i32 or s32 (32-bit)
-         .    * i64 or s64 (64-bit)
-         .
-         .  Unsigned Integers:
-         .    * u8  (8-bit)
-         .    * u16 (16-bit)
-         .    * u32 (32-bit)
-         .    * u64 (64-bit)
-         .
-         .  Floating Point:
-         .    * r32 or f32 (float)
-         .    * r64 or f64 (double)
-         .
-         .  Booleans:
-         .    * b8  (8-bit)
-         .    * b16 (16-bit)
-         .    * b32 (32-bit)
-         .    * b64 (64-bit)
-         .
+.  short typedefs for convenience. A list
+.  follows:
+.  
+.  Signed Integers:
+.    * i8  or s8  (8-bit)
+.    * i16 or s16 (16-bit)
+.    * i32 or s32 (32-bit)
+.    * i64 or s64 (64-bit)
+.
+.  Unsigned Integers:
+.    * u8  (8-bit)
+.    * u16 (16-bit)
+.    * u32 (32-bit)
+.    * u64 (64-bit)
+.
+.  Floating Point:
+.    * r32 or f32 (float)
+.    * r64 or f64 (double)
+.
+.  Booleans:
+.    * b8  (8-bit)
+.    * b16 (16-bit)
+.    * b32 (32-bit)
+.    * b64 (64-bit)
+.
 ..................................................
 
 2  Some macros are used. "it" implies an 
@@ -66,7 +66,8 @@ Codebase Notes
 #define CHIMERA_ENVIRONMENTAL_CHIP  1
 #define CHIMERA_SENSOR_CHIP         0
 
-// C Standard Library
+// C Standard Library Includes
+#include <stdlib.h>
 #include <stdint.h>
 
 // Local Code
