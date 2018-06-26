@@ -5,9 +5,9 @@ Project Chimera Sensor Code
 .  
 .  Code for systems aboard the Project Chimera 
 .  payload, flown by the University of Colorado
- .  Boulder SPS Research group.
- .
- 
+.  Boulder SPS Research group.
+.
+
 Codebase Notes 
 ..................................................
 
