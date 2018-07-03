@@ -3,6 +3,15 @@
 typedef struct State {
     char data_write_buffer[DATA_WRITE_BUFFER_SIZE];
     u64 data_write_position;
+    
+    union {
+        struct {
+            
+        };
+        struct {
+            
+        };
+    };
 } State;
 
 void initialize_state(State **state) {
