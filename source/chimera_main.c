@@ -95,7 +95,7 @@ int main(int argc, char **argv) {
         
         if(state) {
             debug_log("Trying to access i2c interface...");
-            block(I2CHandle i2c = i2c_open("/dev/i2c-1"), 
+            block(I2CHandle i2c = i2c_open(0x6a, "/dev/i2c-1"), 
                   i2c_close(&i2c)) {
                 
                 if(i2c.valid) {

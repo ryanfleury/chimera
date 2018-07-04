@@ -5,14 +5,14 @@ typedef struct I2CHandle {
     char buffer[60];
 } I2CHandle;
 
-I2CHandle i2c_open(const char *filename) {
+I2CHandle i2c_open(i32 address, const char *filename) {
     I2CHandle h = {0};
     
     h.file_handle = open(filename, O_RDWR);
     if(h.file_handle >= 0) {
         h.valid = 1;
         
-        int i2c_slave_address = 0x5a;
+        int i2c_slave_address = address;
         if(ioctl(h.file_handle, 
                  I2C_SLAVE, 
                  i2c_slave_address) >= 0) {
