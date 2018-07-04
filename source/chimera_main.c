@@ -68,6 +68,7 @@ Codebase Notes
 // C Standard Library Includes
 #include <stdlib.h>
 #include <stdint.h>
+#include <stdio.h>
 
 // Local Code
 #include "chimera_utilities.c"
@@ -75,6 +76,12 @@ Codebase Notes
 #include "chimera_state.c"
 
 int main(int argc, char **argv) {
-    printf("Hello, World!\n");
+    printf("Hello, World!\n\n");
+    printf("Here are the program arguments: \n");
+    
+    foreach(i, argc) {
+        printf("%s\n", argv[i]);
+    }
+    
     return 0;
 }

@@ -16,8 +16,7 @@ typedef struct State {
 
 void initialize_state(State **state) {
     *state = (State *)alloc_heap_memory(sizeof(State));
-    state->data_write_position = 0;
-    return state;
+    (*state)->data_write_position = 0;
 }
 
 void update_state(State *state) {
@@ -31,7 +30,8 @@ void update_state(State *state) {
     
     if(state->data_write_position + sizeof(measurements) > 
        CHIMERA_DATA_WRITE_BUFFER_SIZE) {
-        write_data_write_buffer_to_disk(state);
+        // TODO(Ryan): Data writing
+        // write_data_write_buffer_to_disk(state);
         state->data_write_position = 0;
     }
     
@@ -43,7 +43,8 @@ void update_state(State *state) {
 }
 
 void clean_up_state(State **state) {
-    write_data_write_buffer_to_disk(*state);
+    // TODO(Ryan): Data writing
+    // write_data_write_buffer_to_disk(*state);
     
     free_heap_memory(*state);
     *state = 0;
