@@ -36,8 +36,8 @@ void update_state(State *state) {
     }
     
     foreach(i, CHIMERA_MEASUREMENT_COUNT) {
-        (r32 *)(state->data_write_buffer+
-                state->data_write_position) = measurements[i];
+        *(r32 *)(state->data_write_buffer+
+                 state->data_write_position) = measurements[i];
         state->data_write_position += sizeof(r32);
     }
 }
