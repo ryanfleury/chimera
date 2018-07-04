@@ -63,8 +63,7 @@ Codebase Notes
 /************************************************/
 
 // Program Options
-#define CHIMERA_ENVIRONMENTAL_CHIP  1
-#define CHIMERA_SENSOR_CHIP         0
+
 
 // C Standard Library Includes
 #include <stdlib.h>
@@ -72,13 +71,7 @@ Codebase Notes
 
 // Local Code
 #include "chimera_utilities.c"
-
-#if CHIMERA_ENVIRONMENTAL_CHIP
 #include "chimera_chip_environmental.c"
-#elif CHIMERA_SENSOR_CHIP
-#include "chimera_chip_sensor.c"
-#endif
-
 #include "chimera_state.c"
 
 int main(int argc, char **argv) {
