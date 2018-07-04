@@ -90,5 +90,11 @@ int main(int argc, char **argv) {
         printf("%s\n", argv[i]);
     }
     
+    block(I2CHandle i2c = i2c_open("/dev/i2c-1"), 
+          i2c_close(&i2c))
+    {
+        
+    }
+    
     return 0;
 }
