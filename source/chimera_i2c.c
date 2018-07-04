@@ -17,16 +17,16 @@ I2CHandle i2c_open(const char *filename) {
                  I2C_SLAVE, 
                  i2c_slave_address) >= 0) {
             
-            debug_log("Connected to \"%s\" successfully.",
+            debug_log("Connected to \"%s\" successfully",
                       filename);
         }
         else {
             error("Failed to acquire bus access "
-                  "or talk to slave.\n\n");
+                  "or talk to slave");
         }
     }
     else {
-        error("Failed to open \"%s\".\n\n", 
+        error("Failed to open \"%s\"", 
               filename);
     }
     
