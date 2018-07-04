@@ -89,9 +89,9 @@ int main(int argc, char **argv) {
     
     debug_log("Initializing program state...");
     block(
-    { State *state = 0; initialize_state(&state); },
-    clean_up_state(&state)
-    ) {
+        State *state = 0; initialize_state(&state),
+        clean_up_state(&state)
+        ) {
         
         if(state) {
             debug_log("Trying to access i2c interface...");
