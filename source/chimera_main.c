@@ -78,6 +78,7 @@ Codebase Notes
 
 // Local Code
 #include "chimera_utilities.c"
+#include "chimera_debug.c"
 #include "chimera_i2c.c"
 #include "chimera_chip_environmental.c"
 #include "chimera_state.c"
