@@ -1,7 +1,7 @@
 #define CHIMERA_DATA_WRITE_BUFFER_SIZE megabytes(16)
 
 typedef struct State {
-    char data_write_buffer[DATA_WRITE_BUFFER_SIZE];
+    char data_write_buffer[CHIMERA_DATA_WRITE_BUFFER_SIZE];
     u64 data_write_position;
     
     union {
