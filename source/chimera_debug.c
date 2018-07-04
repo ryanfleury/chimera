@@ -2,14 +2,14 @@
 
 void debug_log(const char *format, ...) {
     va_list args;
-    va_start(args);
+    va_start(args, format);
     vsfprintf(stdout, format, args);
     va_end(args);
 }
 
 void error(const char *format, ...) {
     va_list args;
-    va_start(args);
+    va_start(args, format);
     vsfprintf(stderr, format, args);
     va_end(args);
 }
