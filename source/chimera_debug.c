@@ -4,8 +4,10 @@
 
 void _assert_fail_(const char *file, i32 line, 
                    const char *failed_statement) {
+    
     error("Assertion \"%s\" failed in \"%s\" on line %i",
           failed_statement, file, line);
-    debug_log("Trying to exit cleanly...");
+    
+    debug_log("%s", "Trying to exit cleanly...");
     exit(0);
 }
