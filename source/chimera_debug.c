@@ -3,14 +3,14 @@
 void debug_log(const char *format, ...) {
     va_list args;
     va_start(args, format);
-    vfprintf(stdout, format, args);
+    vfprintf(stdout, format "\n", args);
     va_end(args);
 }
 
 void error(const char *format, ...) {
     va_list args;
     va_start(args, format);
-    vfprintf(stderr, format, args);
+    vfprintf(stderr, format "\n", args);
     va_end(args);
 }
 
