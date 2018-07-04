@@ -19,6 +19,14 @@ void initialize_state(State **state) {
     (*state)->data_write_position = 0;
 }
 
+void clean_up_state(State **state) {
+    // TODO(Ryan): Data writing
+    // write_data_write_buffer_to_disk(*state);
+    
+    free_heap_memory(*state);
+    *state = 0;
+}
+
 void update_state(State *state) {
     // NOTE(Ryan): Assumptions:
     // 
@@ -40,12 +48,4 @@ void update_state(State *state) {
                  state->data_write_position) = measurements[i];
         state->data_write_position += sizeof(r32);
     }
-}
-
-void clean_up_state(State **state) {
-    // TODO(Ryan): Data writing
-    // write_data_write_buffer_to_disk(*state);
-    
-    free_heap_memory(*state);
-    *state = 0;
 }

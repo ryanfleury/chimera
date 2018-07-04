@@ -84,17 +84,30 @@ Codebase Notes
 #include "chimera_state.c"
 
 int main(int argc, char **argv) {
-    printf("Hello, World!\n\n");
-    printf("Here are the program arguments: \n");
+    debug_log("PROJECT CHIMERA ENVIRONMENTAL SENSOR");
     
-    foreach(i, argc) {
-        printf("%s\n", argv[i]);
-    }
-    
-    block(I2CHandle i2c = i2c_open("/dev/i2c-1"), 
-          i2c_close(&i2c))
-    {
+    debug_log("Initializing program state...");
+    block(
+    { State *state; initialize_state(&state); },
+    { clean_up_state(&state); }
+    ) {
         
+        if(state) {
+            debug_log("Trying to access i2c interface...");
+            block(I2CHandle i2c = i2c_open("/dev/i2c-1"), 
+                  i2c_close(&i2c)) {
+                
+                if(i2c.valid) {
+                    
+                }
+                else {
+                    error("I2C handle invalid");
+                }
+            }
+        }
+        else {
+            error("Program state initialization failed");
+        }
     }
     
     return 0;

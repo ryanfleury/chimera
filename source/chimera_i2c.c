@@ -19,6 +19,7 @@ I2CHandle i2c_open(const char *filename) {
             
             debug_log("Connected to \"%s\" successfully",
                       filename);
+            
         }
         else {
             error("Failed to acquire bus access "
