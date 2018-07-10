@@ -41,10 +41,13 @@ void i2c_close(I2CHandle *h) {
     h->length = 0;
 }
 
-int i2c_write(I2CHandle *h, char *buffer, u32 length) {
+int i2c_write(I2CHandle *h, char *buffer) {
     int result = 0;
     
-    if(h->length) {
+    if(buffer) {
+        u32 length = 0;
+        for(char *c = buffer; *c++; ++length);
+        
         ssize_t bytes_written = 
             write(h->file_handle, buffer, length);
         if(bytes_written) {
