@@ -2,7 +2,7 @@ typedef struct I2CHandle {
     b32 valid;
     int file_handle;
     i32 length;
-    char buffer[60];
+    char buffer[64];
 } I2CHandle;
 
 I2CHandle i2c_open(i32 address, const char *filename) {
@@ -41,10 +41,36 @@ void i2c_close(I2CHandle *h) {
     h->length = 0;
 }
 
-void i2c_write(I2CHandle *h) {
+int i2c_write(I2CHandle *h, char *buffer, u32 length) {
+    int result = 0;
     
+    if(h->length) {
+        ssize_t bytes_written = 
+            write(h->file_handle, buffer, length);
+        if(bytes_written) {
+            result = 1;
+        }
+        else {
+            result = 0;
+        }
+    }
+    
+    return result;
 }
 
-void i2c_read(I2CHandle *h) {
+int i2c_read(I2CHandle *h) {
+    int result = 0;
     
+    {
+        ssize_t bytes_read = read(h->file_handle, h->buffer, 64);
+        h->length = (i32)bytes_read;
+        if(!bytes_read) {
+            result = 0;
+        }
+        else {
+            result = 1;
+        }
+    }
+    
+    return result;
 }
