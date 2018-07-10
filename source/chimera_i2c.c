@@ -48,13 +48,18 @@ int i2c_write(I2CHandle *h, char *buffer) {
         u32 length = 0;
         for(char *c = buffer; *c++; ++length);
         
+        debug_log("Attempting to write buffer of length %i to i2c", length);
+        
         ssize_t bytes_written = 
             write(h->file_handle, buffer, length);
+        
         if(bytes_written) {
             result = 1;
+            debug_log("Wrote %i bytes to i2c", (i32)bytes_written);
         }
         else {
             result = 0;
+            error("Failed to write to i2c");
         }
     }
     
@@ -65,12 +70,17 @@ int i2c_read(I2CHandle *h) {
     int result = 0;
     
     {
+        debug_log("Attempting to read bytes from i2c"); 
+        
         ssize_t bytes_read = read(h->file_handle, h->buffer, 64);
         h->length = (i32)bytes_read;
+        
         if(!bytes_read) {
+            error("Failed to read from i2c");
             result = 0;
         }
         else {
+            debug_log("Read %i bytes from i2c", (i32)h->length);
             result = 1;
         }
     }
