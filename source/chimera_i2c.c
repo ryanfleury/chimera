@@ -68,7 +68,6 @@ int i2c_write(I2CHandle *h, int address, char *buffer) {
 int i2c_read(I2CHandle *h, int address) {
     int result = 0;
     
-    
     int i2c_slave_address = address;
     if(ioctl(h.file_handle, 
              I2C_SLAVE, 
