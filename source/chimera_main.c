@@ -81,6 +81,7 @@ Codebase Notes
 #include "chimera_utilities.c"
 #include "chimera_debug.c"
 #include "chimera_i2c.c"
+#include "chimera_one_wire.c"
 #include "chimera_i2c_addresses.c"
 #include "chimera_flight_computer.c"
 #include "chimera_state.c"
