@@ -81,35 +81,28 @@ Codebase Notes
 #include "chimera_utilities.c"
 #include "chimera_debug.c"
 #include "chimera_i2c.c"
-#include "chimera_chip_environmental.c"
+#include "chimera_i2c_addresses.c"
+#include "chimera_flight_computer.c"
 #include "chimera_state.c"
 
 int main(int argc, char **argv) {
     debug_log("PROJECT CHIMERA ENVIRONMENTAL SENSOR");
     
     debug_log("Initializing program state...");
-    block(
-        State *state = 0; initialize_state(&state),
-        clean_up_state(&state)
-        ) {
-        
+    
+    State *state = 0; 
+    initialize_state(&state);
+    
+    {
         if(state) {
-            debug_log("Trying to access i2c interface...");
-            block(I2CHandle i2c = i2c_open(0x6a, "/dev/i2c-1"), 
-                  i2c_close(&i2c)) {
-                
-                if(i2c.valid) {
-                    
-                }
-                else {
-                    error("I2C handle invalid");
-                }
-            }
+            while(update_state(state));
         }
         else {
             error("Program state initialization failed");
         }
     }
+    
+    clean_up_state(&state);
     
     return 0;
 }
