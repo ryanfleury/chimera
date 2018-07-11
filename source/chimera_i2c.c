@@ -5,26 +5,12 @@ typedef struct I2CHandle {
     char buffer[64];
 } I2CHandle;
 
-I2CHandle i2c_open(i32 address, const char *filename) {
+I2CHandle i2c_open(const char *filename) {
     I2CHandle h = {0};
     
     h.file_handle = open(filename, O_RDWR);
     if(h.file_handle >= 0) {
         h.valid = 1;
-        
-        int i2c_slave_address = address;
-        if(ioctl(h.file_handle, 
-                 I2C_SLAVE, 
-                 i2c_slave_address) >= 0) {
-            
-            debug_log("Connected to \"%s\" successfully",
-                      filename);
-            
-        }
-        else {
-            error("Failed to acquire bus access "
-                  "or talk to slave");
-        }
     }
     else {
         error("Failed to open \"%s\"", 
@@ -41,35 +27,55 @@ void i2c_close(I2CHandle *h) {
     h->length = 0;
 }
 
-int i2c_write(I2CHandle *h, char *buffer) {
+int i2c_write(I2CHandle *h, int address, char *buffer) {
     int result = 0;
     
-    if(buffer) {
-        u32 length = 0;
-        for(char *c = buffer; *c++; ++length);
+    int i2c_slave_address = address;
+    if(ioctl(h.file_handle, 
+             I2C_SLAVE, 
+             i2c_slave_address) >= 0) {
         
-        debug_log("Attempting to write buffer of length %i to i2c", length);
+        debug_log("Connected to \"%s\" successfully",
+                  filename);
         
-        ssize_t bytes_written = 
-            write(h->file_handle, buffer, length);
-        
-        if(bytes_written) {
-            result = 1;
-            debug_log("Wrote %i bytes to i2c", (i32)bytes_written);
+        if(buffer) {
+            u32 length = 0;
+            for(char *c = buffer; *c++; ++length);
+            
+            debug_log("Attempting to write buffer of length %i to i2c", length);
+            
+            ssize_t bytes_written = 
+                write(h->file_handle, buffer, length);
+            
+            if(bytes_written) {
+                result = 1;
+                debug_log("Wrote %i bytes to i2c", (i32)bytes_written);
+            }
+            else {
+                result = 0;
+                error("Failed to write to i2c");
+            }
         }
-        else {
-            result = 0;
-            error("Failed to write to i2c");
-        }
+    }
+    else {
+        error("Failed to acquire bus access "
+              "or talk to slave");
     }
     
     return result;
 }
 
-int i2c_read(I2CHandle *h) {
+int i2c_read(I2CHandle *h, int address) {
     int result = 0;
     
-    {
+    
+    int i2c_slave_address = address;
+    if(ioctl(h.file_handle, 
+             I2C_SLAVE, 
+             i2c_slave_address) >= 0) {
+        debug_log("Connected to \"%s\" successfully",
+                  filename);
+        
         debug_log("Attempting to read bytes from i2c"); 
         
         ssize_t bytes_read = read(h->file_handle, h->buffer, 64);
@@ -83,6 +89,10 @@ int i2c_read(I2CHandle *h) {
             debug_log("Read %i bytes from i2c", (i32)h->length);
             result = 1;
         }
+    }
+    else {
+        error("Failed to acquire bus access "
+              "or talk to slave");
     }
     
     return result;
