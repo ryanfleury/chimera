@@ -4,6 +4,7 @@ typedef struct OneWireHandle {
 
 OneWireHandle one_wire_open() {
     OneWireHandle h = {0};
+    
     return h;
 }
 
