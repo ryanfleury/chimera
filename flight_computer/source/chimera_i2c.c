@@ -31,12 +31,9 @@ int i2c_write(I2CHandle *h, int address, char *buffer) {
     int result = 0;
     
     int i2c_slave_address = address;
-    if(ioctl(h.file_handle, 
+    if(ioctl(h->file_handle, 
              I2C_SLAVE, 
              i2c_slave_address) >= 0) {
-        
-        debug_log("Connected to \"%s\" successfully",
-                  filename);
         
         if(buffer) {
             u32 length = 0;
@@ -69,11 +66,9 @@ int i2c_read(I2CHandle *h, int address) {
     int result = 0;
     
     int i2c_slave_address = address;
-    if(ioctl(h.file_handle, 
+    if(ioctl(h->file_handle, 
              I2C_SLAVE, 
              i2c_slave_address) >= 0) {
-        debug_log("Connected to \"%s\" successfully",
-                  filename);
         
         debug_log("Attempting to read bytes from i2c"); 
         
