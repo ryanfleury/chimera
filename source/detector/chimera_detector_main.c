@@ -1,11 +1,12 @@
 /*
 
-Project Chimera Sensor Code
+Project Chimera Detector Code
 ..................................................
 .  
 .  Code for systems aboard the Project Chimera 
 .  payload, flown by the University of Colorado
-.  Boulder SPS Research group.
+.  Boulder SPS Research group. Specifically, for
+.  the payload's detectors.
 .
 
 Codebase Notes 
@@ -66,43 +67,15 @@ Codebase Notes
 
 
 // C Standard Library Includes
-#include <stdlib.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <unistd.h>
-#include <linux/i2c-dev.h>
-#include <sys/ioctl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
+
 
 // Local Code
-#include "chimera_utilities.c"
-#include "chimera_debug.c"
-#include "chimera_i2c.c"
-#include "chimera_one_wire.c"
-#include "chimera_i2c_definitions.c"
-#include "chimera_state.c"
+#include "chimera_shared.c"
 
-int main(int argc, char **argv) {
-    debug_log("PROJECT CHIMERA ENVIRONMENTAL SENSOR");
+void setup() {
     
-    debug_log("Initializing program state...");
+}
+
+void loop() {
     
-    State *state = 0; 
-    initialize_state(&state);
-    
-    {
-        if(state) {
-            while(update_state(state));
-        }
-        else {
-            error("Program state initialization failed");
-        }
-    }
-    
-    clean_up_state(&state);
-    
-    return 0;
 }
