@@ -74,8 +74,40 @@ Codebase Notes
 
 void setup() {
     
+    enum {
+        
+#define pin(name, number) PIN_ ## name,
+#include "chimera_detector_pins.c"
+#undef pin
+        
+        MAX_PIN
+    };
+    
+    u8 pin_numbers[MAX_PIN] = {
+        
+#define pin(name, number) number ,
+#include "chimera_detector_pins.c"
+#undef pin
+        
+    };
+    
+    const char *pin_names[MAX_PIN] = {
+        
+#define pin(name, number) #name ,
+#include "chimera_detector_pins.c"
+#undef pin
+        
+    };
+    
+    foreach(i, MAX_PIN) {
+        pinMode(pin_numbers[i], INPUT);
+    }
+    
+    while(1) {
+        
+        // TODO(Ryan): Update
+        
+    }
 }
 
-void loop() {
-    
-}
+void loop() {}
