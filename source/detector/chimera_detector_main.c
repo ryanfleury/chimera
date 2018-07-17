@@ -71,6 +71,7 @@ Codebase Notes
 
 // Local Code
 #include "chimera_shared.c"
+#include "chimera_detector_dma.c"
 
 void setup() {
     
