@@ -69,11 +69,18 @@ Codebase Notes
 // C Standard Library Includes
 
 
+// Teensyduino Includes
+#include <Arduino.h>
+#include "ADC.h"
+#include "RingBufferDMA.h"
+
 // Local Code
 #include "chimera_shared.c"
-#include "chimera_detector_dma.c"
 
-void setup() {
+global b32 quit = 0;
+
+extern "C"
+int main(void) {
     
     enum {
         
@@ -104,11 +111,25 @@ void setup() {
         pinMode(pin_numbers[i], INPUT);
     }
     
-    while(1) {
-        
-        // TODO(Ryan): Update
+    Serial.begin(115200);
+    attachInterrupt(pin_numbers[PIN_quit_signal], on_quit_signal, RISING);
+    
+    ADC *adc = new ADC();
+    RingBufferDMA *dma_buffer = new RingBufferDMA(buffer, buffer_size,
+                                                  pin_numbers[PIN_adc_input]);
+    
+    while(!quit) {
+        // @TODO(Ryan):
         
     }
 }
 
-void loop() {}
+void on_quit_signal() {
+    u32 quit_count = 0;
+    while(digitalReadFast(pin_numbers[PIN_quit_signal])) {
+        if(++quit_count > 10) {
+            quit = 1;
+            break;
+        }
+    }
+}
