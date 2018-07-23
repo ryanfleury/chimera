@@ -29,7 +29,7 @@ void initialize_state(State **state) {
         
 #define measurement(name, address) {\ 
             (*state)->measurement_addresses[CHIMERA_MEASUREMENT_ ## name] = address; \
-            (*state)->measurement_names[CHIMERA_MEASUREMENT_ ## nmae] = #name; \
+            (*state)->measurement_names[CHIMERA_MEASUREMENT_ ## name] = #name; \
         }
 #include "chimera_fc_measurements.c"
 #undef measurement
