@@ -33,4 +33,3 @@ typedef i64 b64;
 #define free_heap_memory(m)  free(m)
 
 #define foreach(i, lim) for(u64 (i) = 0; (i) < (u64)(lim); ++(i))
-#define block(start, end) start; for(i32 _i_i_ = 0; _i_i_ < 1; ++_i_i_, end)

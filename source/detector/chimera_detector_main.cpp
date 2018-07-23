@@ -79,40 +79,44 @@ Codebase Notes
 
 global b32 quit = 0;
 
-extern "C"
-int main(void) {
+// Pin data and definitions
+enum {
     
-    enum {
-        
 #define pin(name, number) PIN_ ## name,
 #include "chimera_detector_pins.c"
 #undef pin
-        
-        MAX_PIN
-    };
     
-    u8 pin_numbers[MAX_PIN] = {
-        
+    MAX_PIN
+};
+
+global
+u8 pin_numbers[MAX_PIN] = {
+    
 #define pin(name, number) number ,
 #include "chimera_detector_pins.c"
 #undef pin
-        
-    };
     
-    const char *pin_names[MAX_PIN] = {
-        
+};
+
+global
+const char *pin_names[MAX_PIN] = {
+    
 #define pin(name, number) #name ,
 #include "chimera_detector_pins.c"
 #undef pin
-        
-    };
+    
+};
+
+// Main function
+extern "C"
+int main(void) {
     
     foreach(i, MAX_PIN) {
         pinMode(pin_numbers[i], INPUT);
     }
     
     Serial.begin(115200);
-    attachInterrupt(pin_numbers[PIN_quit_signal], on_quit_signal, RISING);
+    attachInterrupt(pin_numbers[PIN_quit_signal], quit_signal_callback, RISING);
     
     ADC *adc = new ADC();
     RingBufferDMA *dma_buffer = new RingBufferDMA(buffer, buffer_size,
@@ -124,7 +128,7 @@ int main(void) {
     }
 }
 
-void on_quit_signal() {
+void quit_signal_callback() {
     u32 quit_count = 0;
     while(digitalReadFast(pin_numbers[PIN_quit_signal])) {
         if(++quit_count > 10) {
