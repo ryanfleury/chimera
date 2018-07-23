@@ -96,7 +96,6 @@ int update_state(State *state) {
                      state->data_write_position) = measurements[i];
             state->data_write_position += sizeof(r32);
         }
-        
     }
     else {
         error("Failed to load measurements");
