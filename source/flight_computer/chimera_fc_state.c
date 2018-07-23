@@ -56,18 +56,15 @@ int load_measurements(State *state,
     int result = 0;
     
     foreach(i, CHIMERA_MEASUREMENT_COUNT) {
-        if(i2c_write(&state->i2c,
-                     state->measurement_addresses[i],
-                     "")) {
-            if(i2c_read(&state->i2c, 
-                        state->measurement_addresses[i])) {
-                
-            }
-            else {
-                error("Failed to take measurement %i (\"%s\")",
-                      (int)i, 
-                      state->measurement_names[i]);
-            }
+        if(i2c_read(&state->i2c, 
+                    state->measurement_addresses[i])) {
+            
+        }
+        else {
+            error("Failed to take measurement #%i, \"%s\" (%i)",
+                  (int)i, 
+                  state->measurement_names[i],
+                  errno());
         }
     }
     

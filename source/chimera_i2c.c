@@ -75,7 +75,7 @@ int i2c_read(I2CHandle *h, int address) {
         ssize_t bytes_read = read(h->file_handle, h->buffer, 4);
         h->length = (i32)bytes_read;
         
-        if(!bytes_read) {
+        if(bytes_read <= 0) {
             error("Failed to read from i2c");
             result = 0;
         }
