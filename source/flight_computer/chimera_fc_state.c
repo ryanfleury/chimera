@@ -27,7 +27,7 @@ void initialize_state(State **state) {
             error("Failed to access to i2c interface");
         }
         
-#define measurement(name, address) {\ 
+#define measurement(name, address) {\
             (*state)->measurement_addresses[CHIMERA_MEASUREMENT_ ## name] = address; \
             (*state)->measurement_names[CHIMERA_MEASUREMENT_ ## name] = #name; \
         }
