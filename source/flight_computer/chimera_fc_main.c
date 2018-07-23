@@ -78,6 +78,7 @@ Codebase Notes
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <errno.h>
 
 // Local Code
 #include "chimera_shared.c"
