@@ -74,6 +74,7 @@ Codebase Notes
 #include <stdarg.h>
 #include <unistd.h>
 #include <linux/i2c-dev.h>
+#include <i2c/smbus.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
