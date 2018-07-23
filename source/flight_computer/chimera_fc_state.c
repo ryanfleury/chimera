@@ -81,8 +81,8 @@ int update_state(State *state) {
     
     r32 measurements[CHIMERA_MEASUREMENT_COUNT] = {0};
     
+    result = 1;
     if(load_measurements(state, measurements)) {
-        result = 1;
         
         if(state->data_write_position + sizeof(measurements) > 
            CHIMERA_DATA_WRITE_BUFFER_SIZE) {
