@@ -53,7 +53,7 @@ void clean_up_state(State **state) {
 
 int load_measurements(State *state,
                       r32 measurements[CHIMERA_MEASUREMENT_COUNT]) {
-    int result = 0;
+    int result = 1;
     
     foreach(i, CHIMERA_MEASUREMENT_COUNT) {
         if(i2c_read(&state->i2c, 
@@ -61,6 +61,7 @@ int load_measurements(State *state,
             
         }
         else {
+            result = 0;
             error("Failed to take measurement #%i, \"%s\" (%i)",
                   (int)i, 
                   state->measurement_names[i],
@@ -99,7 +100,6 @@ int update_state(State *state) {
     }
     else {
         error("Failed to load measurements");
-        result = 0;
     }
     
     return result;
