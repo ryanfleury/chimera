@@ -64,7 +64,7 @@ int load_measurements(State *state,
             error("Failed to take measurement #%i, \"%s\" (%i)",
                   (int)i, 
                   state->measurement_names[i],
-                  errno());
+                  errno);
         }
     }
     
