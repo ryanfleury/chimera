@@ -81,13 +81,14 @@ Codebase Notes
 
 // Local Code
 #include "chimera_utilities.h"
+#include "chimera_dma_ring_buffer.h"
 
 global b32 quit = 0;
 
 // Pin data and definitions
 enum {
     
-#define pin(name, number) PIN_ ## name,
+#define pin(name, number, mode) PIN_ ## name,
 #include "chimera_detector_pins.h"
 #undef pin
     
@@ -97,7 +98,7 @@ enum {
 global
 u8 pin_numbers[MAX_PIN] = {
     
-#define pin(name, number) number ,
+#define pin(name, number, mode) number ,
 #include "chimera_detector_pins.h"
 #undef pin
     
@@ -114,31 +115,33 @@ const char *pin_names[MAX_PIN] = {
 };
 */
 
+global
+i16 dma_buffer[kilobytes(64)] = {0};
+
 // Main function
 extern "C"
 int main(void) {
-    pinMode(13, OUTPUT);
-    
-    /*
-    foreach(i, MAX_PIN) {
-        pinMode(pin_numbers[i], INPUT);
-    }
+  
+#define pin(name, number, mode) pinMode(pin_numbers[PIN_ ## name], mode);
+#include "chimera_detector_pins.h"
+#undef pin
     
     Serial.begin(115200);
     attachInterrupt(pin_numbers[PIN_quit_signal], quit_signal_callback, RISING);
     
-    ADC *adc = new ADC();
-    RingBufferDMA *dma_buffer = new RingBufferDMA(buffer, buffer_size,
-                                                  pin_numbers[PIN_adc_input]);
-    */
+    //ADC *adc = new ADC();
+    DMARingBuffer dma_ring_buffer = dma_ring_buffer_init(dma_buffer, sizeof(dma_buffer), 
+                                                         pin_numbers[PIN_adc_input]);
     
     while(!quit) {
         // @TODO(Ryan):
-        digitalWrite(13, HIGH);
+        digitalWrite(pin_numbers[PIN_led], HIGH);
         delay(200);
-        digitalWrite(13, LOW);
+        digitalWrite(pin_numbers[PIN_led], LOW);
         delay(200);
     }
+
+    dma_ring_buffer_clean_up(&dma_ring_buffer);
 }
 
 void quit_signal_callback() {
