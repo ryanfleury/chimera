@@ -1,13 +1,12 @@
 /*
 
-Project Chimera Flight Computer Code
+Project Chimera Detector Code
 ..................................................
 .  
 .  Code for systems aboard the Project Chimera 
 .  payload, flown by the University of Colorado
 .  Boulder SPS Research group. Specifically, for
-.  the flight computer which runs the 
-.  environmental sensors.
+.  the payload's detectors.
 .
 
 Codebase Notes 
@@ -61,6 +60,7 @@ Codebase Notes
 .    alternate memory free method is required.
 .    
 ..................................................
+*/
 
 /************************************************/
 
@@ -68,42 +68,85 @@ Codebase Notes
 
 
 // C Standard Library Includes
+#include <stdint.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdarg.h>
-#include <unistd.h>
-#include <linux/i2c-dev.h>
-#include <sys/ioctl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <errno.h>
+
+// Teensyduino Includes
+#include <Arduino.h>
+#include "ADC.h"
+#include "RingBufferDMA.h"
 
 // Local Code
-#include "chimera_utilities.c"
-#include "chimera_fc_debug.c"
-#include "chimera_fc_i2c.c"
-#include "chimera_fc_i2c_definitions.c"
-#include "chimera_fc_state.c"
+#include "chimera_utilities.h"
 
-int main(int argc, char **argv) {
-    debug_log("PROJECT CHIMERA FLIGHT COMPUTER");
+global b32 quit = 0;
+
+// Pin data and definitions
+enum {
     
-    debug_log("Initializing program state...");
+#define pin(name, number) PIN_ ## name,
+#include "chimera_detector_pins.h"
+#undef pin
     
-    State *state = 0; 
-    initialize_state(&state);
+    MAX_PIN
+};
+
+global
+u8 pin_numbers[MAX_PIN] = {
     
-    if(state) {
-        while(update_state(state));
+#define pin(name, number) number ,
+#include "chimera_detector_pins.h"
+#undef pin
+    
+};
+
+/*
+global
+const char *pin_names[MAX_PIN] = {
+    
+#define pin(name, number) #name ,
+#include "chimera_detector_pins.h"
+#undef pin
+    
+};
+*/
+
+// Main function
+extern "C"
+int main(void) {
+    pinMode(13, OUTPUT);
+    
+    /*
+    foreach(i, MAX_PIN) {
+        pinMode(pin_numbers[i], INPUT);
     }
-    else {
-        error("Program state initialization failed");
+    
+    Serial.begin(115200);
+    attachInterrupt(pin_numbers[PIN_quit_signal], quit_signal_callback, RISING);
+    
+    ADC *adc = new ADC();
+    RingBufferDMA *dma_buffer = new RingBufferDMA(buffer, buffer_size,
+                                                  pin_numbers[PIN_adc_input]);
+    */
+    
+    while(!quit) {
+        // @TODO(Ryan):
+        digitalWrite(13, HIGH);
+        delay(200);
+        digitalWrite(13, LOW);
+        delay(200);
     }
-    
-    debug_log("Cleaning up program state...");
-    clean_up_state(&state);
-    
-    return 0;
+}
+
+void quit_signal_callback() {
+    u32 quit_count = 0;
+    while(digitalReadFast(pin_numbers[PIN_quit_signal])) {
+        if(++quit_count > 10) {
+            quit = 1;
+            break;
+        }
+    }
 }
