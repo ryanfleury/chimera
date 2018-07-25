@@ -81,7 +81,7 @@ Codebase Notes
 
 // Local Code
 #include "chimera_utilities.h"
-#include "chimera_dma_ring_buffer.h"
+#include "chimera_dma_handle.h"
 
 global b32 quit = 0;
 
@@ -104,19 +104,16 @@ u8 pin_numbers[MAX_PIN] = {
     
 };
 
-/*
+global const
+u32 dma_buffer_size = kilobytes(128);
 global
-const char *pin_names[MAX_PIN] = {
-    
-#define pin(name, number) #name ,
-#include "chimera_detector_pins.h"
-#undef pin
-    
-};
-*/
+DMAMEM volatile i16 __attribute__((aligned(dma_buffer_size+0))) dma_buffer[dma_buffer_size/sizeof(i16)];
 
-global
-i16 dma_buffer[kilobytes(64)] = {0};
+ADC *adc = new ADC();
+RingBufferDMA *ring_buffer_dma = new RingBufferDMA(dma_buffer, 
+                                                   dma_buffer_size/sizeof(i16),
+                                                   ADC_0);
+DMAHandle dma_handle;
 
 // Main function
 extern "C"
@@ -129,22 +126,42 @@ int main(void) {
     Serial.begin(115200);
     attachInterrupt(pin_numbers[PIN_quit_signal], quit_signal_callback, RISING);
     
-    //ADC *adc = new ADC();
-    DMARingBuffer dma_ring_buffer = dma_ring_buffer_init(dma_buffer, sizeof(dma_buffer), 
-                                                         pin_numbers[PIN_adc_input]);
+    
+    adc->setAveraging(8);
+    adc->setResolution(12);
+    adc->enableDMA(ADC_0);
+    adc->enableInterrupts(ADC_0);
+    
+//    dma_handle = dma_handle_init(dma_buffer, sizeof(dma_buffer), 
+ //                                ADC_0);
+
+    //dma_handle_start(&dma_handle, &dma_isr);
+
+    ring_buffer_dma->start(dma_isr);
     
     while(!quit) {
-        // @TODO(Ryan):
-        digitalWrite(pin_numbers[PIN_led], HIGH);
-        delay(200);
-        digitalWrite(pin_numbers[PIN_led], LOW);
-        delay(200);
+        i32 value = digitalRead(pin_numbers[PIN_test_led]);
+        if(!value) {
+            digitalWriteFast(pin_numbers[PIN_led], HIGH);
+            delay(200);
+            digitalWriteFast(pin_numbers[PIN_led], LOW);
+            delay(200);
+        }
+        else {
+            digitalWriteFast(pin_numbers[PIN_led], LOW);
+        }
     }
+    
 
-    dma_ring_buffer_clean_up(&dma_ring_buffer);
+    //dma_handle_clean_up(&dma_handle);
 }
 
-void quit_signal_callback() {
+void dma_isr(void) {
+    digitalWriteFast(pin_numbers[PIN_led], HIGH);
+    ring_buffer_dma->dmaChannel->clearInterrupt();
+}
+
+void quit_signal_callback(void) {
     u32 quit_count = 0;
     while(digitalReadFast(pin_numbers[PIN_quit_signal])) {
         if(++quit_count > 10) {
