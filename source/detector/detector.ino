@@ -109,11 +109,17 @@ u32 dma_buffer_size = kilobytes(128);
 global
 DMAMEM volatile i16 __attribute__((aligned(dma_buffer_size+0))) dma_buffer[dma_buffer_size/sizeof(i16)];
 
-ADC *adc = new ADC();
+ADC adc;
 RingBufferDMA *ring_buffer_dma = new RingBufferDMA(dma_buffer, 
                                                    dma_buffer_size/sizeof(i16),
                                                    ADC_0);
 DMAHandle dma_handle;
+
+void debug_blink() {
+    digitalWriteFast(pin_numbers[PIN_led], HIGH);
+    delay(500);
+    digitalWriteFast(pin_numbers[PIN_led], LOW);
+}
 
 // Main function
 extern "C"
@@ -125,26 +131,21 @@ int main(void) {
     
     Serial.begin(115200);
     attachInterrupt(pin_numbers[PIN_quit_signal], quit_signal_callback, RISING);
-    
-    
-    adc->setAveraging(8);
-    adc->setResolution(12);
-    adc->enableDMA(ADC_0);
-    adc->enableInterrupts(ADC_0);
-    
-//    dma_handle = dma_handle_init(dma_buffer, sizeof(dma_buffer), 
- //                                ADC_0);
 
-    //dma_handle_start(&dma_handle, &dma_isr);
-
+    adc.setAveraging(8);
+    adc.setResolution(12);
+    adc.enableDMA(ADC_0);
+    adc.enableInterrupts(ADC_0);
+    
     ring_buffer_dma->start(dma_isr);
     
     while(!quit) {
         i32 value = digitalRead(pin_numbers[PIN_test_led]);
+        
         if(!value) {
-            digitalWriteFast(pin_numbers[PIN_led], HIGH);
+            digitalWrite(pin_numbers[PIN_led], HIGH);
             delay(200);
-            digitalWriteFast(pin_numbers[PIN_led], LOW);
+            digitalWrite(pin_numbers[PIN_led], LOW);
             delay(200);
         }
         else {
