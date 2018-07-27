@@ -79,8 +79,8 @@ int load_measurements(State *state,
         reg = 0x03;
         u8 lsb = i2c_read_byte_data(&state->i2c, reg);
         
-        i16 temperature = 0 | msb << 8;
-        temperature |= lsb;
+        i16 temperature = ((i16)(msb) << 8);
+        temperature |= (i16)lsb;
         
         fprintf(stderr, "%i ", (i32)temperature);
     }

@@ -47,7 +47,7 @@ i32 i2c_access(I2CHandle *h, char read_write, u8 command, int size,
 i32 i2c_read_byte_data(I2CHandle *h, u8 command) {
     union i2c_smbus_data data;
     if(i2c_access(h, I2C_SMBUS_READ, command,
-                  I2C_SMBUS_BYTE_DATA, &data)) {
+                  I2C_SMBUS_BYTE_DATA, &data) == -1) {
         return -1;
     }
     else {
