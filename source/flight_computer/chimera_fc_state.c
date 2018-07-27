@@ -81,6 +81,8 @@ int load_measurements(State *state,
         
         i16 temperature = 0 | msb << 8;
         temperature |= lsb;
+        
+        fprintf(stderr, "%i ", (i32)temperature);
     }
     
     return result;
