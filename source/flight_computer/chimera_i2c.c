@@ -51,6 +51,6 @@ i32 i2c_read_byte_data(I2CHandle *h, u8 command) {
         return -1;
     }
     else {
-        return 0x0FF & data.byte;
+        return data.byte;
     }
 }
