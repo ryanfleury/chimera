@@ -27,67 +27,30 @@ void i2c_close(I2CHandle *h) {
     h->length = 0;
 }
 
-int i2c_write(I2CHandle *h, int address, char *buffer) {
-    int result = 0;
-    
-    int i2c_slave_address = address;
-    if(ioctl(h->file_handle, 
-             I2C_SLAVE, 
-             i2c_slave_address) >= 0) {
-        
-        if(buffer) {
-            u32 length = 0;
-            for(char *c = buffer; *c++; ++length);
-            
-            debug_log("Attempting to write buffer of length %i to i2c", length);
-            
-            ssize_t bytes_written = 
-                write(h->file_handle, buffer, length);
-            
-            if(bytes_written) {
-                result = 1;
-                debug_log("Wrote %i bytes to i2c", (i32)bytes_written);
-            }
-            else {
-                result = 0;
-                error("Failed to write to i2c");
-            }
-        }
-    }
-    else {
-        error("Failed to acquire bus access "
-              "or talk to slave");
-    }
-    
+i32 i2c_set_address(I2CHandle *h, u8 address) {
+    i32 result = ioctl(h->file_handle, I2C_SLAVE, address);
     return result;
 }
 
-int i2c_read(I2CHandle *h, int address) {
-    int result = 0;
+i32 i2c_access(I2CHandle *h, char read_write, u8 command, int size,
+               union i2c_smbus_data *data) {
+    struct i2c_smbus_ioctl_data args;
     
-    int i2c_slave_address = address;
-    if(ioctl(h->file_handle, 
-             I2C_SLAVE, 
-             i2c_slave_address) >= 0) {
-        
-        debug_log("Attempting to read bytes from i2c"); 
-        
-        ssize_t bytes_read = read(h->file_handle, h->buffer, 64);
-        h->length = (i32)bytes_read;
-        
-        if(bytes_read <= 0) {
-            error("Failed to read from i2c");
-            result = 0;
-        }
-        else {
-            debug_log("Read %i bytes from i2c", (i32)h->length);
-            result = 1;
-        }
+    args.read_write = read_write;
+    args.command = command;
+    args.size = size;
+    args.data = data;
+    
+    return ioctl(h->file_handle, I2C_SMBUS, &args);
+}
+
+i32 i2c_read_byte_data(I2CHandle *h, u8 command) {
+    union i2c_smbus_data data;
+    if(i2c_smbus_access(h, I2C_SMBUS_READ, command,
+                        I2C_SMBUS_BYTE_DATA, &data)) {
+        return -1;
     }
     else {
-        error("Failed to acquire bus access "
-              "or talk to slave");
+        return 0x0FF & data.byte;
     }
-    
-    return result;
 }

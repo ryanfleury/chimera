@@ -1,5 +1,71 @@
+/*
+
+Project Chimera Detector Code
+..................................................
+.  
+.  Code for systems aboard the Project Chimera 
+.  payload, flown by the University of Colorado
+.  Boulder SPS Research group. Specifically, for
+.  the payload's detectors.
+.
+
+Codebase Notes 
+..................................................
+
+1  Fixed-size types are standard, and have
+.  short typedefs for convenience. A list
+.  follows:
+.  
+.  Signed Integers:
+.    * i8  or s8  (8-bit)
+.    * i16 or s16 (16-bit)
+.    * i32 or s32 (32-bit)
+.    * i64 or s64 (64-bit)
+.
+.  Unsigned Integers:
+.    * u8  (8-bit)
+.    * u16 (16-bit)
+.    * u32 (32-bit)
+.    * u64 (64-bit)
+.
+.  Floating Point:
+.    * r32 or f32 (float)
+.    * r64 or f64 (double)
+.
+.  Booleans:
+.    * b8  (8-bit)
+.    * b16 (16-bit)
+.    * b32 (32-bit)
+.    * b64 (64-bit)
+.
+..................................................
+
+2  Some macros are used. "it" implies an 
+.  iterating value.
+.  
+.  * foreach(it, limit) is equivalent to:
+.    for(u64 it = 0; it < limit; ++it)
+.
+.  * alloc_heap_memory(num_bytes) is an alias for
+.    a function that heap-allocates memory
+.    and returns a void * to it. This maps to the
+.    C standard library's "malloc" function.
+.    This is provided in the case where an 
+.    alternate allocation method is required.
+.
+.  * free_heap_memory(ptr) is an alias for a
+.    function that releases memory. This maps to
+.    the C standard library's "free" function.
+.    This is provided in the case where an
+.    alternate memory free method is required.
+.    
+..................................................
+*/
+
+/************************************************/
+
 // Program Options
-#define FILE_SYSTEM 3
+#define LED_PIN 13
 
 // Libraries
 #include <ADC.h>
@@ -14,10 +80,10 @@
 
 // connect out_pins to adc pins, PWM output on out pins will be measured.
 
-const u8 adc0_pin0 = A0;  // digital pin 33, on ADC0
-const u8 adc0_pin1 = A1;  // digital pin 34, on ADC0
-const u8 adc1_pin0 = A2;  // digital pin 31, on ADC1
-const u8 adc1_pin1 = A3;  // digital pin 32, on ADC1
+const u8 adc0_pin0 = A0;
+const u8 adc0_pin1 = A1;
+const u8 adc1_pin0 = A2;
+const u8 adc1_pin1 = A3;
 
 constexpr std::array<u8, 4> adc_pins = { adc0_pin0, adc0_pin1, adc1_pin0, adc1_pin1 };
 constexpr std::array<u8, 4> out_pins = { 5, 6, 9, 10 };
@@ -51,7 +117,12 @@ u32 current_file = 0;
 
 global
 SdFs sd;
+
+global
 FsFile file;
+
+global
+elapsedMicros elapsed_microseconds;
 
 size_t bufferWriteIndex(size_t channel) {
     uintptr_t buffer_start = uintptr_t(buffers[channel].data());
@@ -60,9 +131,12 @@ size_t bufferWriteIndex(size_t channel) {
 }
 
 void setup() {
+    b32 error = 0;
+    
     for(size_t i = 0; i < sizeof(adc_modules)/sizeof(adc_modules[0]); i++) adc_modules[i] = adc.adc[i];
     for(auto pin : adc_pins) pinMode(pin, INPUT);
-
+    pinMode(LED_PIN, OUTPUT);
+    
     serial.begin(9600);
     delay(2000);
     serial.println("Starting");
@@ -122,8 +196,8 @@ void setup() {
     PDB0_MOD = (u16)(mod-1);
 
     u32 pdb_ch_config = PDB_C1_EN (0b11) | // enable ADC A and B channel
-                             PDB_C1_TOS(0b11) | // enables the channel delay
-                             PDB_C1_BB (0b00);  // back-to-back trigger disabled
+                        PDB_C1_TOS(0b11) | // enables the channel delay
+                        PDB_C1_BB (0b00);  // back-to-back trigger disabled
     PDB0_CH0C1 = pdb_ch_config; // ADC 0
     PDB0_CH1C1 = pdb_ch_config; // ADC 1
 
@@ -134,8 +208,8 @@ void setup() {
     PDB0_CH1DLY1 = u16(mod / 2 - 1);
 
     const u32 pdb_base_conf = PDB_SC_TRGSEL(0b1011) |               // triggered by FTM3
-                                   PDB_SC_PDBEN |                        // enable
-                                   PDB_SC_PRESCALER(0) | PDB_SC_MULT(0); // count at F_BUS
+                              PDB_SC_PDBEN |                        // enable
+                              PDB_SC_PRESCALER(0) | PDB_SC_MULT(0); // count at F_BUS
                                    
     // sync buffered registers
     PDB0_SC = pdb_base_conf | PDB_SC_LDOK;
@@ -156,6 +230,26 @@ void setup() {
 
     if(!sd.begin(SdSpiConfig(SDCARD_SS_PIN, DEDICATED_SPI, SD_SCK_MHZ(50)))) {
         Serial.println("ERROR: SD Card initialization failed.");
+        error = 1;
+    }
+
+    // Error produces 10 fast blinks.
+    if(error) {
+        foreach(i, 100) {
+            digitalWrite(LED_PIN, HIGH);
+            delay(50);
+            digitalWrite(LED_PIN, LOW);
+            delay(50);
+        }
+    }
+    // Non-error produces 3 slower blinks.
+    else {
+        foreach(i, 3) {
+            digitalWrite(LED_PIN, HIGH);
+            delay(200);
+            digitalWrite(LED_PIN, LOW);
+            delay(200);
+        }
     }
     
     delay(500);
@@ -172,6 +266,8 @@ void save_buffer_to_disk() {
     snprintf(filename, 32, "data%i", (int)(current_file++));
     file.open(filename, O_WRITE | O_CREAT);
     if(file) {
+        u64 time_since_start = micros();
+        file.write((u8 *)(&time_since_start), sizeof(u64));
         file.write((u8 *)(buffers[0].data()), sizeof(u16)*30000);
         file.close();
     }
