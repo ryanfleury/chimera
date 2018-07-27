@@ -83,7 +83,7 @@ Codebase Notes
 
 // Local Code
 #include "chimera_utilities.c"
-#include "chimera_fc_debug.c"
+#include "chimera_debug.c"
 #include "chimera_fc_i2c.c"
 #include "chimera_fc_i2c_definitions.c"
 #include "chimera_fc_state.c"
