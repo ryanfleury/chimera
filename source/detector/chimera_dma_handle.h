@@ -47,3 +47,4 @@ i16 dma_handle_read(DMAHandle *r) {
     i16 result = r->buffer[r->buffer_write_pos];
     return result;
 }
+

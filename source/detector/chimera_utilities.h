@@ -35,3 +35,4 @@ typedef i64 b64;
 #define foreach(i, lim) for(u64 (i) = 0; (i) < (u64)(lim); ++(i))
 
 #define global static
+
