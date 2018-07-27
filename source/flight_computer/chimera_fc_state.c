@@ -69,15 +69,15 @@ int load_measurements(State *state,
     
     // Take temperature measurement
     {
-        u8 register; 
+        u8 reg; 
         
         i2c_set_address(&state->i2c, CHIMERA_TEMPERATURE_I2C_ADDRESS);
         
-        register = 0x04;
-        u8 msb = i2c_read_byte_data(&state->i2c, register);
+        reg = 0x04;
+        u8 msb = i2c_read_byte_data(&state->i2c, reg);
         
-        register = 0x03;
-        u8 lsb = i2c_read_byte_data(&state->i2c, register);
+        reg = 0x03;
+        u8 lsb = i2c_read_byte_data(&state->i2c, reg);
         
         i16 temperature = 0 | msb << 8;
         temperature |= lsb;
