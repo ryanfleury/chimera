@@ -48,6 +48,21 @@ void initialize_state(State **state) {
         
         (*state)->data_write_position = 0;
         (*state)->current_file = 0;
+        
+        // Set up temperature sensor
+        {
+            char buffer[16] = {0};
+            buffer[0] = 0b00000001;
+            
+            if(i2c_write(&(*state)->i2c, 
+                         CHIMERA_TEMPERATURE_I2C_ADDRESS, 0x26,
+                         buffer, 1)) {
+                debug_log("Set temperature sensor state to active");
+            }
+            else {
+                error("Failed to set temperature sensor into active mode");
+            }
+        }
     }
     else {
         error("Failed to allocate enough memory for the flight computer state");
@@ -69,20 +84,31 @@ int load_measurements(State *state,
     
     // Take temperature measurement
     {
-        u8 reg; 
+        char buffer[2] = {0};
         
-        i2c_set_address(&state->i2c, CHIMERA_TEMPERATURE_I2C_ADDRESS);
+        u8 reg;
+        u8 msb;
+        u8 lsb;
         
         reg = 0x04;
-        u8 msb = i2c_read_byte_data(&state->i2c, reg);
         
-        reg = 0x03;
-        u8 lsb = i2c_read_byte_data(&state->i2c, reg);
-        
-        i16 temperature = ((i16)(msb) << 8);
-        temperature |= (i16)lsb;
-        
-        fprintf(stderr, "%i ", (i32)temperature);
+        if(i2c_read(&state->i2c, CHIMERA_TEMPERATURE_I2C_ADDRESS, reg,
+                    buffer, 1)) {
+            
+            msb = (u8)state->i2c.buffer[0];
+            
+            reg = 0x03;
+            if(i2c_read(&state->i2c, CHIMERA_TEMPERATURE_I2C_ADDRESS, reg,
+                        buffer, 1)) {
+                lsb = (u8)state->i2c.buffer[0];
+            }
+            else {
+                error("Failed to read least significant byte for temperature");
+            }
+        }
+        else {
+            error("Failed to read most significant byte for temperature");
+        }
     }
     
     return result;

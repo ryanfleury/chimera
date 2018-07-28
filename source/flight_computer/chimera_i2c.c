@@ -1,8 +1,6 @@
 typedef struct I2CHandle {
     b32 valid;
     int file_handle;
-    i32 length;
-    char buffer[64];
 } I2CHandle;
 
 I2CHandle i2c_open(const char *filename) {
@@ -24,33 +22,58 @@ void i2c_close(I2CHandle *h) {
     close(h->file_handle);
     h->file_handle = 0;
     h->valid = 0;
-    h->length = 0;
 }
 
-i32 i2c_set_address(I2CHandle *h, u8 address) {
-    i32 result = ioctl(h->file_handle, I2C_SLAVE, address);
+i32 i2c_write(I2CHandle *h, i32 address, u8 register,
+              char *buffer, i32 len) {
+    i32 result = 0;
+    { 
+        if(len > 0) {
+            if(ioctl(h->file_handle, I2C_SLAVE, address) >= 0) {
+                i32 write_result;
+                if((write_result = write(h->file_handle, buffer, len)) == len) {
+                    result = 1;
+                }
+                else {
+                    error("Write of %i bytes returned %i",
+                          len, 
+                          write_result);
+                }
+            }
+            else {
+                error("Failed to communicate with i2c device");
+            }
+        }
+        else {
+            error("Attempted write of negative bytes");
+        }
+    }
     return result;
 }
 
-i32 i2c_access(I2CHandle *h, char read_write, u8 command, int size,
-               union i2c_smbus_data *data) {
-    struct i2c_smbus_ioctl_data args;
-    
-    args.read_write = read_write;
-    args.command = command;
-    args.size = size;
-    args.data = data;
-    
-    return ioctl(h->file_handle, I2C_SMBUS, &args);
-}
-
-i32 i2c_read_byte_data(I2CHandle *h, u8 command) {
-    union i2c_smbus_data data;
-    if(i2c_access(h, I2C_SMBUS_READ, command,
-                  I2C_SMBUS_BYTE_DATA, &data) == -1) {
-        return -1;
+i32 i2c_read(I2CHandle *h, i32 address, u8 register, 
+             char *buffer, i32 len) {
+    i32 result = 0;
+    {
+        if(len > 0) {
+            if(ioctl(h->file_handle, I2C_SLAVE, address) >= 0) {
+                i32 read_result;
+                if((read_result = read(h->file_handle, buffer, len)) == len) {
+                    result = 1;
+                }
+                else {
+                    error("Read of %i bytes returned %i",
+                          len,
+                          read_result);
+                }
+            }
+            else {
+                error("Failed to communicate with i2c device");
+            }
+        }
+        else {
+            error("Attempted read of negative bytes");
+        }
     }
-    else {
-        return data.byte;
-    }
+    return result;
 }
